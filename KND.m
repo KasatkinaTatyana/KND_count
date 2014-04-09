@@ -17,8 +17,10 @@ k = 1;
 dx=lambda*0.7;
 dy=lambda*0.6;
 
-A=dx*49;    % 9 = N1 - 1
-B=dy*49;    % 9 = N2 - 1
+Size_X=99;
+Size_Y=99;
+A=dx*Size_X;    % Size_X = N1 - 1
+B=dy*Size_Y;    % Size_Y = N2 - 1
 
 m = floor(A/dx);
 n = floor(B/dy);
@@ -47,17 +49,17 @@ phi_otkl = 0;
 
 E1 = zeros(m,n);
 E2 = zeros(m,n);
-% for count1=1:n
-%     E1(:,count1) = 0.3 + 0.7*cos(X(:,count1)/abs(min(min(X)))*pi/2);
-% end
-% for count1=1:m
-%     E2(count1,:) = 0.3 + 0.7*cos(Y(count1,:)/abs(min(min(Y)))*pi/2);
-% end
-% 
-% E = E1.*E2;
+for count1=1:n
+    E1(:,count1) = 0.3 + 0.7*cos(X(:,count1)/abs(min(min(X)))*pi/2);
+end
+for count1=1:m
+    E2(count1,:) = 0.3 + 0.7*cos(Y(count1,:)/abs(min(min(Y)))*pi/2);
+end
+
+E = E1.*E2;
 % figure
 % plot3(X,Y,E,'*r')
-E = ones(m,n);
+% E = ones(m,n);
 
 Phase = - k.* (X.*cos(pi/180*phi_otkl) + Y.*sin(pi/180*phi_otkl)).*sin(pi/180*theta_otkl);
 ex1 = exp(1i*Phase);
@@ -75,7 +77,8 @@ Fizl=1;
 FN = zeros(1,length(theta));
 for count1 = 1:length(theta)
     Exp = exp(1i.*k.*( X.*cos(phi_otkl.*pi./180) + Y.*sin(phi_otkl.*pi./180)).*sin(theta(count1).*pi./180) );
-    FN(count1) = sum(sum(E.*ex1.*Exp));
+%     FN(count1) = sum(sum(E.*ex1.*Exp));
+    FN(count1) = sum(sum(E));
 end
 
 Norm = max(abs(FN.*Fizl));
