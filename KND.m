@@ -1,13 +1,16 @@
 clc
 clear all
 close all
+global Size_X Size_Y E X Y k
 
 f = 34e9;       %[Гц]
 c = 3e11;       %[мм/с]
 lambda = c/f;   %[мм]
+
 % k = 2*pi/lambda;
+
 k = 1;
-% 
+ 
 % dx = 6;         %[мм]
 % dy = 6;         %[мм]
 % 
@@ -17,8 +20,8 @@ k = 1;
 dx=lambda*0.7;
 dy=lambda*0.6;
 
-Size_X=99;
-Size_Y=99;
+Size_X=2;
+Size_Y=2;
 A=dx*Size_X;    % Size_X = N1 - 1
 B=dy*Size_Y;    % Size_Y = N2 - 1
 
@@ -47,19 +50,22 @@ phi_otkl = 0;
 
 
 
-E1 = zeros(m,n);
-E2 = zeros(m,n);
-for count1=1:n
-    E1(:,count1) = 0.3 + 0.7*cos(X(:,count1)/abs(min(min(X)))*pi/2);
-end
-for count1=1:m
-    E2(count1,:) = 0.3 + 0.7*cos(Y(count1,:)/abs(min(min(Y)))*pi/2);
-end
-
-E = E1.*E2;
+% E1 = zeros(m,n);
+% E2 = zeros(m,n);
+% for count1=1:n
+%     E1(:,count1) = 0.3 + 0.7*cos(X(:,count1)/abs(min(min(X)))*pi/2);
+% end
+% for count1=1:m
+%     E2(count1,:) = 0.3 + 0.7*cos(Y(count1,:)/abs(min(min(Y)))*pi/2);
+% end
+% 
+% E = E1.*E2;
+%% 
 % figure
 % plot3(X,Y,E,'*r')
-% E = ones(m,n);
+%%
+
+E = ones(m,n);
 
 Phase = - k.* (X.*cos(pi/180*phi_otkl) + Y.*sin(pi/180*phi_otkl)).*sin(pi/180*theta_otkl);
 ex1 = exp(1i*Phase);
@@ -101,18 +107,22 @@ end
 %% Расчет КНД
 
 
-D = 0;
+% D = 0;
+% for count1=1:length(phi)
+%     D = D + sum(F1{count1}.^2 .*sin(theta*pi/180))*dtheta*dphi*pi*pi/180/180;
+% end
+D=dblquad(@F_angle,0,2*pi,0,pi/2,0.001);
 
-for count1=1:length(phi)
-    D = D + sum(F1{count1}.^2 .*sin(theta*pi/180))*dtheta*dphi*pi*pi/180/180;
-end
 D1 = 4*pi*Norm^2/D;
-toc;
 
 disp(D1);
 D_dB = 10*log10(D1)
-
-
+%% Объемный КНД
+for count2 = 1:length(phi)
+    F1{count2} = (abs(F{count2})./Norm);
+    G_angle{count2} = 4*pi*((abs(F1{count2})).^2)./D;
+end
+toc;
 %% Адекватность результата
 
 D2 = 4*pi*A*B/lambda/lambda;
